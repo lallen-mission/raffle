@@ -25,7 +25,7 @@ def create_app():
     # Mobility(app)
     login_manager = LoginManager(app)
     login_manager.login_view = 'main.index'
-    login_manager.logout_view = 'meta.logout'
+    login_manager.logout_view = 'auth.logout'
 
     @login_manager.user_loader
     def load_user(user_id):
