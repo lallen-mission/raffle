@@ -1,0 +1,43 @@
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img src="/static/img/Mission_Loop.png" height="150">
+        <h1 style="padding-left: .25em" class="title">{{ config.SITE_NAME }}</h1>
+      </a>
+  
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+  
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/">
+          Home
+        </a>
+  
+        <a class="navbar-item" href="https://missioncloud.com" target="_blank">
+          Mission
+        </a>
+        </div>
+      </div>
+  
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            {% if current_user.is_authenticated %}
+                <button class="button">
+                    <img src="{{ current_user.profile_pic }}" alt="{{ current_user.email }} Google profile pic">
+                    <p>{{ current_user.name }}</p>
+                </button>
+                <a href="/logout" class="button is-primary">Logout</a>
+            {% else %}
+                <a class="button is-light" href="{{ url_for('auth.login') }}">Log in</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>

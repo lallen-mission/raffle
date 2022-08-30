@@ -6,6 +6,7 @@ load_dotenv()
 # App
 SECRET_KEY = getenv('SECRET_KEY', 'yyyyyyyyyyyyy')
 SERVER_NAME = getenv('SERVER_NAME', '127.0.0.1:5000')
+SITE_NAME = getenv('SITE_NAME', 'Raffler')
 TEMPLATES_AUTO_RELOAD = getenv('TEMPLATES_AUTO_RELOAD', True)
 
 # DB
@@ -22,40 +23,3 @@ GOOGLE_CLIENT_SECRET = getenv('GOOGLE_CLIENT_SECRET', None)
 GOOGLE_DISCOVERY_URL = (
     'https://accounts.google.com/.well-known/openid-configuration'
 )
-
-# Logging
-LOGGING_CONFIG = {
-    'version': 1,
-    'formatters': {'default': {
-        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
-    }},
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'default',
-            'stream': 'ext://sys.stdout',
-        },
-        'wsgi': {
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://flask.logging.wsgi_errors_stream',
-            'formatter': 'default'
-        }
-    },
-    'loggers': {
-        'gunicorn.error': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'gunicorn.access': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        }
-    },
-    'root': {
-        'level': 'DEBUG',
-        'handlers': ['console']
-    }
-}
