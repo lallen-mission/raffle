@@ -56,6 +56,8 @@ class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     uuid = db.Column(db.String(100), default=rand_id, unique=True)
     create_date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_by = db.Column(db.ForeignKey('users.id'))
+    confirmed = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return str(self.uuid)
@@ -91,7 +93,7 @@ class Drawing(db.Model):
         return str(self.name)
 
 
-class DrawingPrizes(db.Model):
+class DrawingPrize(db.Model):
     """
     Association objects for drawings and prizes; includes winner.
     """

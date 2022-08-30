@@ -24,7 +24,7 @@ def create_app():
     setup_db(app)
     # Mobility(app)
     login_manager = LoginManager(app)
-    login_manager.login_view = 'main.index'
+    login_manager.login_view = 'auth.login'
     login_manager.logout_view = 'auth.logout'
 
     @login_manager.user_loader
@@ -34,7 +34,8 @@ def create_app():
         return user
 
     with app.app_context():
-        from app.routes import auth, main
+        from app.routes import auth, main, raffle
         app.register_blueprint(main.bp)
         app.register_blueprint(auth.bp)
+        app.register_blueprint(raffle.bp)
         return app

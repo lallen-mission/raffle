@@ -11,3 +11,4 @@ alembic
 psycopg2-binary
 oauthlib
 flake8
+qrcode
