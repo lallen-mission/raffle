@@ -1,0 +1,9 @@
+DB_PASS=__youmakethisup__
+DB_USER=raffler
+DB_NAME=raffler
+DB_HOST=localhost
+
+SITE_NAME=Raffler
+SECRET_KEY=__youmakethisup__
+SERVER_NAME=127.0.0.1:5000
+ADMIN_EMAIL=__you@yourdomain.com__

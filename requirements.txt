@@ -1,0 +1,11 @@
+Flask
+Flask-SQLAlchemy
+Flask-WTF
+requests
+SQLAlchemy
+arrow
+Flask-Login
+Flask-Mobility
+python-dotenv
+alembic
+psycopg2-binary
