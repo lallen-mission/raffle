@@ -9,3 +9,5 @@ Flask-Mobility
 python-dotenv
 alembic
 psycopg2-binary
+oauthlib
+flake8

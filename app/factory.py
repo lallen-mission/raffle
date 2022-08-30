@@ -1,14 +1,14 @@
-from logging.config import dictConfig
-
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from flask_mobility import Mobility
+# from flask_mobility import Mobility
+from oauthlib.oauth2 import WebApplicationClient
 
 from app import config
 
 
 db = SQLAlchemy()
+GoogleClient = WebApplicationClient(config.GOOGLE_CLIENT_ID)
 
 
 def setup_db(app: Flask, db: SQLAlchemy = db):
@@ -22,10 +22,10 @@ def create_app():
     app = Flask(__name__)
     app.config.from_envvar('FLASK_SECRETS')
     setup_db(app)
-    Mobility(app)
+    # Mobility(app)
     login_manager = LoginManager(app)
-    login_manager.login_view = 'meta.index'
-    login_manager.logout_view = 'meta.disconnect'
+    login_manager.login_view = 'main.index'
+    login_manager.logout_view = 'meta.logout'
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -34,6 +34,7 @@ def create_app():
         return user
 
     with app.app_context():
-        from app.routes import meta
-        app.register_blueprint(meta.bp)
+        from app.routes import auth, main
+        app.register_blueprint(main.bp)
+        app.register_blueprint(auth.bp)
         return app

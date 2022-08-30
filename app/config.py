@@ -12,8 +12,16 @@ TEMPLATES_AUTO_RELOAD = getenv('TEMPLATES_AUTO_RELOAD', True)
 DB_USER = getenv('DB_USER', 'raffler')
 DB_PASS = getenv('DB_PASS', 'xxxxxxxxxxx')
 DB_NAME = getenv('DB_NAME', 'raffler')
-DB_HOST = getenv('DB_HOST', '`127.0.0.1`')
+DB_HOST = getenv('DB_HOST', '127.0.0.1')
 DB_PORT = getenv('DB_PORT', '5432')
+
+# Auth
+# Configuration
+GOOGLE_CLIENT_ID = getenv('GOOGLE_CLIENT_ID', None)
+GOOGLE_CLIENT_SECRET = getenv('GOOGLE_CLIENT_SECRET', None)
+GOOGLE_DISCOVERY_URL = (
+    'https://accounts.google.com/.well-known/openid-configuration'
+)
 
 # Logging
 LOGGING_CONFIG = {
@@ -48,6 +56,6 @@ LOGGING_CONFIG = {
     },
     'root': {
         'level': 'DEBUG',
-        'handlers': ['console'],
+        'handlers': ['console']
     }
 }
