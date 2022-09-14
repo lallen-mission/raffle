@@ -9,7 +9,7 @@ down:
 	docker-compose down
 
 dev:
-	./bin/dev_app
+	./manage.sh run
 
 init:
 	./bin/cmd init

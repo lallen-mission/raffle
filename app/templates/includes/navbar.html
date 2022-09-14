@@ -23,13 +23,9 @@
             <div class="navbar-item">
                 <div class="buttons">
                     {% if current_user.is_authenticated %}
-                        <button class="button">
-                            <img src="{{ current_user.profile_pic }}" alt="{{ current_user.email }} Google profile pic">
-                            <p>{{ current_user.name }}</p>
-                        </button>
-                        <a href="/logout" class="button is-primary">Logout</a>
+                        <a href="/logout" class="button"><img src="{{ current_user.profile_pic }}" alt="{{ current_user.email }} Google profile pic"> Log out ({{ current_user.name }})</a>
                     {% else %}
-                        <a class="button is-light" href="{{ url_for('auth.login') }}">Log in</a>
+                        <a class="button is-primary" href="{{ url_for('auth.login') }}">Log in</a>
                     {% endif %}
                 </div>
             </div>
