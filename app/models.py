@@ -74,6 +74,7 @@ class Prize(db.Model):
     image_url = db.Column(db.String(300))
     description = db.Column(db.String(1200))
     ship_to_winner = db.Column(db.Boolean)
+    create_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return str(self.name)
@@ -89,6 +90,7 @@ class Drawing(db.Model):
     name = db.Column(db.String(50))
     date_started = db.Column(db.DateTime, nullable=True)
     date_ended = db.Column(db.DateTime, nullable=True)
+    create_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return str(self.name)
@@ -101,9 +103,12 @@ class DrawingPrize(db.Model):
     __tablename__ = 'drawingprizes'
 
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    prize_id = db.Column(db.ForeignKey('prizes.id'))
-    drawing_id = db.Column(db.ForeignKey('drawings.id'))
+    prize_id = db.Column(db.ForeignKey('prizes.id', ondelete='CASCADE'))
+    prize = db.relationship('Prize')
+    drawing_id = db.Column(db.ForeignKey('drawings.id', ondelete='CASCADE'))
+    drawing = db.relationship('Drawing')
     winner = db.Column(db.ForeignKey('entries.id'))
+    create_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return str(self.id)

@@ -5,7 +5,7 @@ from qrcode import make as qrcode_make
 from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import login_required
 
-from app.models import Entry, Prize, Drawing
+from app.models import Entry, Prize, Drawing, DrawingPrize
 from app.factory import db
 
 bp = Blueprint('raffle', 'raffle')
@@ -144,9 +144,11 @@ def manage_drawings():
             print(e)
             flash('Something went wrong. Try again.', 'is-danger')
     drawings = Drawing.query.all()
+    prizes = Prize.query.all()
     return render_template(
         'raffle/manage_drawings.html',
-        drawings=drawings
+        drawings=drawings,
+        prizes=prizes
     )
 
 
@@ -167,9 +169,32 @@ def show_drawing(id):
                 flash('Edited item!', 'is-success')
             else:
                 flash('No changes.', 'is-info')
+        elif request.method == 'GET' and request.args:
+            if request.args.get('add'):
+                to_add = DrawingPrize(
+                    prize_id=request.args.get('add'),
+                    drawing_id=drawing.id
+                )
+                db.session.add(to_add)
+                db.session.commit()
+                flash(f'Added prize #{request.args.get("add")}', 'is-success')
+                return redirect(url_for('raffle.show_drawing', id=drawing.id))
+            elif request.args.get('remove'):
+                to_remove = DrawingPrize.query.filter(DrawingPrize.id == request.args.get('remove')).first()
+                if to_remove:
+                    db.session.delete(to_remove)
+                    db.session.commit()
+                    flash(f'Removed drawing prize #{to_remove.id} from {drawing.name}', 'is-success')
+                    return redirect(url_for('raffle.show_drawing', id=drawing.id))
+        all_prizes = Prize.query.all()
+        drawing_prizes = DrawingPrize.query.filter(
+            DrawingPrize.drawing_id == drawing.id
+        ).order_by(DrawingPrize.create_date.asc())
         return render_template(
             'raffle/show_drawing.html', 
-            drawing=drawing
+            drawing=drawing,
+            all_prizes=all_prizes,
+            drawing_prizes=drawing_prizes
         )
 
 

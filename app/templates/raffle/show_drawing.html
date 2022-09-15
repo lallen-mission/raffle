@@ -13,6 +13,28 @@
     <section class="hero is-small">
         <div class="hero-body">
             <p class="title">Edit Drawing #{{ drawing.id }}</p>
+            <p><strong>Drawing Prizes</strong></p>
+                {% if drawing_prizes.count() == 0  %}
+                    <p class="ml-3">No prizes selected yet for this drawing. Add them with the buttons below.</p>
+                {% endif %}
+                {% for _prize in drawing_prizes | batch(4) %}
+                <div class="columns">
+                    {% for prize in _prize %}
+                        <div class="column">    
+                            <article class="message is-primary">
+                                <div class="message-header">
+                                <p>#{{ prize.prize_id }} - {{ prize.prize.name }}</p>
+                                <a href="?remove={{ prize.id }}" class="delete" aria-label="delete"></a>
+                                </div>
+                                <div class="message-body">
+                                    <img src="{{ prize.prize.image_url }}" style="max-width:80px;max-height:80px;">
+                                </div>
+                            </article>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
             <form action="" method="post">
                 <div class="field">
                     <label class="label">Name</label>
@@ -32,6 +54,13 @@
                     </div>
                 </div>
             </form>
+        </div>
+        <div>
+            {% for prize in all_prizes %}
+                <div class="column">
+                    <a class="button" href="{{ url_for('raffle.show_drawing', id=drawing.id, add=prize.id) }}">Add {{ prize.name }}</a>
+                </div>
+            {% endfor %}
         </div>
     </section>
     <div id="modal-delete-confirm" class="modal">
