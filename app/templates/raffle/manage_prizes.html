@@ -1,0 +1,69 @@
+{% extends 'includes/base.html' %}
+
+{% block title %}Manage Prizes{% endblock %}
+
+{% block content %}
+    <section class="hero is-centered">
+        <div class="hero-body">
+        <p class="title">
+            Manage Prizes
+        </p>
+        <p class="subtitle">
+            {% if not prizes %}
+                <p>No prizes entered yet. Add some below!</p>
+            {% endif %}
+            <ul>
+                {% for prize in prizes %}
+                    <li><a href="{{ url_for('raffle.show_prize', id=prize.id) }}">#{{ prize.id }} - {{ prize.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </p>
+        </div>
+    </section>
+    <section class="hero">
+        <div class="hero-body">
+            <p class="title">Add a Prize</p>
+            <form action="" method="post">
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                    <input class="input" name="name" type="text" placeholder="Nintendo Switch, Electric Scooter, etc">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Image URL</label>
+                    <div class="control">
+                    <input class="input" name="image_url" type="text" placeholder="Link to product image">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Description</label>
+                    <div class="control">
+                    <textarea class="textarea" name="description" placeholder="Put the product description/details, manufacturer, model number, etc."></textarea>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Ship to Winner</label>
+                    <div class="control">
+                    <label class="radio">
+                        <input type="radio" name="ship" value="yes">
+                        Yes
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="ship" value="no">
+                        No
+                    </label>
+                    </div>
+                </div>
+                <div class="field is-grouped">
+                    <div class="control">
+                    <button class="button is-link">Submit</button>
+                    </div>
+                    <div class="control">
+                    <a href="" class="button is-link is-light">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

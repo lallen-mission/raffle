@@ -1,0 +1,22 @@
+{% extends 'includes/base.html' %}
+
+{% block title %}Prize #{{ prize.id }}{% endblock %}
+
+{% block content %}
+    <section class="hero is-centered">
+        <div class="hero-body">
+            <p class="title">
+                Prize #{{ prize.id }}
+            </p>
+            <p class="subtitle">
+                <strong>Name:</strong> {{ prize.name }}
+                <br>
+                <strong>Description:</strong> {{ prize.description }}
+                <br>
+                <img src="{{ prize.image_url }}"/>
+            </p>
+            <a href="" class="button is-link m-4">Edit</a>
+            <a href="{{ url_for('raffle.delete_prize', id=prize.id) }}" class="button is-danger m-4">Delete</a>
+        </div>
+    </section>
+{% endblock %}

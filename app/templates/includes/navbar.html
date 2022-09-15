@@ -32,3 +32,20 @@
         </div>
     </div>
 </nav>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <nav class="level">
+        <div class="level-item has-text-centered">
+            {% for category, message in messages %}
+                <article class="message {{ category }}">
+                    <div class="message-body">
+                        {{ message }}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </nav>
+{% endif %}
+{% endwith %}

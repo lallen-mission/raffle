@@ -72,7 +72,7 @@ class Prize(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(150))
     image_url = db.Column(db.String(300))
-    description = db.Column(db.String(300))
+    description = db.Column(db.String(1200))
 
     def __repr__(self):
         return str(self.name)

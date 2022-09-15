@@ -2,10 +2,10 @@ from io import BytesIO
 from base64 import b64encode
 
 from qrcode import make as qrcode_make
-from flask import Blueprint, render_template, url_for
+from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import login_required
 
-from app.models import Entry
+from app.models import Entry, Prize
 from app.factory import db
 
 bp = Blueprint('raffle', 'raffle')
@@ -25,16 +25,64 @@ def enter_raffle():
     )
 
 
-@bp.route('/add/prize')
+@bp.route('/prize/manage', methods=['GET', 'POST'])
 @login_required
-def add_prize():
-    return 'ok'
+def manage_prizes():
+    if request.method == 'POST' and request.form:
+        try:
+            assert len(request.form.get('name')) > 3
+            assert len(request.form.get('image_url')) > 3 and request.form.get('image_url').startswith('http') == True
+            existing = Prize.query.filter(Prize.name == request.form.get('name')).first()
+            if not existing:
+                p = Prize(
+                    name=request.form.get('name'),
+                    image_url=request.form.get('image_url'),
+                    description=request.form.get('description', '')
+                )
+                db.session.add(p)
+                db.session.commit()
+                flash('Added new prize!', 'is-success')
+            else:
+                flash('Prize already exists!', 'is-warning')
+        except AssertionError:
+            flash('Invalid prize configuration. Try again.', 'is-warning')
+        except Exception as e:
+            print(e)
+            flash('Something went wrong. Try again.', 'is-danger')
+    prizes = Prize.query.all()
+    return render_template(
+        'raffle/manage_prizes.html',
+        prizes=prizes
+    )
 
 
-@bp.route('/add/drawing')
+@bp.route('/prize/show/<id>')
 @login_required
-def add_drawing():
-    return 'ok'
+def show_prize(id):
+    prize = Prize.query.filter(Prize.id == id).first()
+    if not prize:
+        flash('No prize there big dawg', 'is-warning')
+        return redirect(url_for('raffle.manage_prizes'))
+    else:
+        # flash('grats foo', 'is-success')
+        return render_template('raffle/show_prize.html', prize=prize)
+
+
+@bp.route('/prize/delete/<id>')
+@login_required
+def delete_prize(id):
+    prize = Prize.query.filter(Prize.id == id).first()
+    if prize:
+        flash(f'You deleted prize #{prize.id} ({prize.name})', 'is-success')
+        db.session.delete(prize)
+        db.session.commit()
+        return redirect(url_for('raffle.manage_prizes'))
+
+
+@bp.route('/drawing/manage')
+@login_required
+def manage_drawings():
+    return render_template('raffle/manage_drawings.html')
 
 
 @bp.route('/show/entry/<uuid>')
@@ -49,11 +97,6 @@ def show_entry(uuid):
         'raffle/show_entry.html',
         entry=entry
     )
-
-
-@bp.route('/show/prize')
-def show_prize():
-    return 'ok'
 
 
 @bp.route('/show/drawing')
