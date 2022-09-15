@@ -5,10 +5,12 @@ from qrcode import make as qrcode_make
 from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import login_required
 
-from app.models import Entry, Prize
+from app.models import Entry, Prize, Drawing
 from app.factory import db
 
 bp = Blueprint('raffle', 'raffle')
+
+# Enter raffle
 
 @bp.route('/enter')
 @login_required
@@ -24,6 +26,21 @@ def enter_raffle():
         qrcode=b64encode(_qr.getvalue()).decode()
     )
 
+
+@bp.route('/show/entry/<uuid>')
+def show_entry(uuid):
+    entry = Entry.query.filter(Entry.uuid == uuid).first()
+    if not entry:
+        return redirect(url_for('main.index'))
+    if not entry.confirmed:
+        entry.confirmed = True
+        db.session.commit()
+    return render_template(
+        'raffle/show_entry.html',
+        entry=entry
+    )
+
+# Prizes
 
 @bp.route('/prize/manage', methods=['GET', 'POST'])
 @login_required
@@ -103,26 +120,65 @@ def delete_prize(id):
         return redirect(url_for('raffle.manage_prizes'))
 
 
-@bp.route('/drawing/manage')
+# Drawing
+
+@bp.route('/drawing/manage', methods=['GET', 'POST'])
 @login_required
 def manage_drawings():
-    return render_template('raffle/manage_drawings.html')
-
-
-@bp.route('/show/entry/<uuid>')
-def show_entry(uuid):
-    entry = Entry.query.filter(Entry.uuid == uuid).first()
-    if not entry:
-        return redirect(url_for('main.index'))
-    if not entry.confirmed:
-        entry.confirmed = True
-        db.session.commit()
+    if request.method == 'POST' and request.form:
+        try:
+            assert len(request.form.get('name')) > 3
+            existing = Drawing.query.filter(Drawing.name == request.form.get('name')).first()
+            if not existing:
+                d = Drawing(
+                    name=request.form.get('name')
+                )
+                db.session.add(d)
+                db.session.commit()
+                flash('Added new drawing!', 'is-success')
+            else:
+                flash('Drawing already exists!', 'is-warning')
+        except AssertionError:
+            flash('Invalid drawing name. Try again.', 'is-warning')
+        except Exception as e:
+            print(e)
+            flash('Something went wrong. Try again.', 'is-danger')
+    drawings = Drawing.query.all()
     return render_template(
-        'raffle/show_entry.html',
-        entry=entry
+        'raffle/manage_drawings.html',
+        drawings=drawings
     )
 
 
-@bp.route('/show/drawing')
-def show_drawing():
-    return 'ok'
+@bp.route('/drawing/show/<id>', methods=['GET', 'POST'])
+def show_drawing(id):
+    drawing = Drawing.query.filter(Drawing.id == id).first()
+    if not Drawing:
+        flash('No drawing there big dawg', 'is-warning')
+        return redirect(url_for('raffle.manage_drawings'))
+    else:
+        edited = None
+        if request.method == 'POST' and request.form:
+            if request.form.get('name') != drawing.name:
+                drawing.name = request.form.get('name')
+                db.session.commit()
+                edited = True
+            if edited:
+                flash('Edited item!', 'is-success')
+            else:
+                flash('No changes.', 'is-info')
+        return render_template(
+            'raffle/show_drawing.html', 
+            drawing=drawing
+        )
+
+
+@bp.route('/drawing/delete/<id>')
+@login_required
+def delete_drawing(id):
+    drawing = Drawing.query.filter(Drawing.id == id).first()
+    if drawing:
+        flash(f'You deleted drawing #{drawing.id} ({drawing.name})', 'is-success')
+        db.session.delete(drawing)
+        db.session.commit()
+        return redirect(url_for('raffle.manage_drawings'))

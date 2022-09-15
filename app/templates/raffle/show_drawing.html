@@ -1,0 +1,49 @@
+{% extends 'includes/base.html' %}
+
+{% block title %}Drawing #{{ drawing.id }}{% endblock %}
+
+{% block content %}
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li class="mt-1"><a href="/">Home</a></li>
+            <li><a href="{{ url_for('raffle.manage_drawings') }}">Manage Drawings</a></li>
+            <li class="is-active"><a href="#" aria-current="page">{{ drawing.name }}</a></li>
+        </ul>
+    </nav>
+    <section class="hero is-small">
+        <div class="hero-body">
+            <p class="title">Edit Drawing #{{ drawing.id }}</p>
+            <form action="" method="post">
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                    <input class="input" name="name" type="text" value="{{ drawing.name }}">
+                    </div>
+                </div>
+                <div class="field is-grouped mt-4">
+                    <div class="control">
+                        <a href="" class="button is-link is-light">Cancel</a>
+                    </div>
+                    <div class="control">
+                        <button class="button is-link">Save</button>
+                    </div>
+                    <div class="control">
+                        <a class="button is-danger js-modal-trigger" data-target="modal-delete-confirm">Delete</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    <div id="modal-delete-confirm" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div class="box">
+            <p class="title">Confirm Deletion</p>
+            <p class="subtitle">Are you sure you want to delete drawing #{{ drawing.id }} ({{ drawing.name }})?</p>
+            <a href="" class="button is-light m-4">Cancel</a>
+            <a href="{{ url_for('raffle.delete_drawing', id=drawing.id) }}" class="button is-danger m-4">Delete It</a>
+          </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+{% endblock %}
