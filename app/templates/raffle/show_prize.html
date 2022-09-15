@@ -3,20 +3,73 @@
 {% block title %}Prize #{{ prize.id }}{% endblock %}
 
 {% block content %}
-    <section class="hero is-centered">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li class="mt-1"><a href="/">Home</a></li>
+            <li><a href="{{ url_for('raffle.manage_prizes') }}">Manage Prizes</a></li>
+            <li class="is-active"><a href="#" aria-current="page">{{ prize.name }}</a></li>
+        </ul>
+    </nav>
+    <section class="hero is-small">
         <div class="hero-body">
-            <p class="title">
-                Prize #{{ prize.id }}
-            </p>
-            <p class="subtitle">
-                <strong>Name:</strong> {{ prize.name }}
-                <br>
-                <strong>Description:</strong> {{ prize.description }}
-                <br>
-                <img src="{{ prize.image_url }}"/>
-            </p>
-            <a href="" class="button is-link m-4">Edit</a>
-            <a href="{{ url_for('raffle.delete_prize', id=prize.id) }}" class="button is-danger m-4">Delete</a>
+            <p class="title">Edit Prize #{{ prize.id }}</p>
+            <form action="" method="post">
+                <div class="field">
+                    <label class="label">Name</label>
+                    <div class="control">
+                    <input class="input" name="name" type="text" value="{{ prize.name }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Image URL</label>
+                    <div class="control">
+                        <input class="input" name="image_url" type="text" value="{{ prize.image_url }}">
+                        <img src="{{ prize.image_url }}" max-height=400px/>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Description</label>
+                    <div class="control">
+                        <textarea class="textarea" name="description">{{ prize.description }}</textarea>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Ship to Winner</label>
+                    <div class="control">
+                    <label class="radio">
+                        <input type="radio" name="ship" value="yes" {{ (prize.ship_to_winner == False) or 'checked' }}>
+                        Yes
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="ship" value="no" {{ (prize.ship_to_winner == True) or 'checked' }}>
+                        No
+                    </label>
+                    </div>
+                </div>
+                <div class="field is-grouped mt-4">
+                    <div class="control">
+                        <a href="" class="button is-link is-light">Cancel</a>
+                    </div>
+                    <div class="control">
+                        <button class="button is-link">Save</button>
+                    </div>
+                    <div class="control">
+                        <a class="button is-danger js-modal-trigger" data-target="modal-delete-confirm">Delete</a>
+                    </div>
+                </div>
+            </form>
         </div>
     </section>
+    <div id="modal-delete-confirm" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div class="box">
+            <p class="title">Confirm Deletion</p>
+            <p class="subtitle">Are you sure you want to delete prize #{{ prize.id }} ({{ prize.name }})?</p>
+            <a href="" class="button is-light m-4">Cancel</a>
+            <a href="{{ url_for('raffle.delete_prize', id=prize.id) }}" class="button is-danger m-4">Delete It</a>
+          </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
 {% endblock %}

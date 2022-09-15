@@ -3,7 +3,13 @@
 {% block title %}Manage Prizes{% endblock %}
 
 {% block content %}
-    <section class="hero is-centered">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li class="mt-1"><a href="/">Home</a></li>
+            <li class="is-active"><a href="#" aria-current="page">Manage Prizes</a></li>
+        </ul>
+    </nav>
+    <section class="hero is-centered is-small">
         <div class="hero-body">
         <p class="title">
             Manage Prizes
@@ -14,13 +20,13 @@
             {% endif %}
             <ul>
                 {% for prize in prizes %}
-                    <li><a href="{{ url_for('raffle.show_prize', id=prize.id) }}">#{{ prize.id }} - {{ prize.name }}</a></li>
+                    <li class="subtitle"><a href="{{ url_for('raffle.show_prize', id=prize.id) }}">#{{ prize.id }} - {{ prize.name }}</a></li>
                 {% endfor %}
             </ul>
         </p>
         </div>
     </section>
-    <section class="hero">
+    <section class="hero is-small">
         <div class="hero-body">
             <p class="title">Add a Prize</p>
             <form action="" method="post">

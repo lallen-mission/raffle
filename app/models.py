@@ -73,6 +73,7 @@ class Prize(db.Model):
     name = db.Column(db.String(150))
     image_url = db.Column(db.String(300))
     description = db.Column(db.String(1200))
+    ship_to_winner = db.Column(db.Boolean)
 
     def __repr__(self):
         return str(self.name)

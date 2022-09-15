@@ -31,7 +31,6 @@ def manage_prizes():
     if request.method == 'POST' and request.form:
         try:
             assert len(request.form.get('name')) > 3
-            assert len(request.form.get('image_url')) > 3 and request.form.get('image_url').startswith('http') == True
             existing = Prize.query.filter(Prize.name == request.form.get('name')).first()
             if not existing:
                 p = Prize(
@@ -56,7 +55,7 @@ def manage_prizes():
     )
 
 
-@bp.route('/prize/show/<id>')
+@bp.route('/prize/show/<id>', methods=['GET', 'POST'])
 @login_required
 def show_prize(id):
     prize = Prize.query.filter(Prize.id == id).first()
@@ -64,7 +63,32 @@ def show_prize(id):
         flash('No prize there big dawg', 'is-warning')
         return redirect(url_for('raffle.manage_prizes'))
     else:
-        # flash('grats foo', 'is-success')
+        edited = None
+        if request.method == 'POST' and request.form:
+            if request.form.get('name') != prize.name:
+                prize.name = request.form.get('name')
+                db.session.commit()
+                edited = True
+            if request.form.get('image_url') != prize.image_url:
+                prize.image_url = request.form.get('image_url')
+                db.session.commit()
+                edited = True
+            if request.form.get('description') != prize.description:
+                prize.description = request.form.get('description')
+                db.session.commit()
+                edited = True
+            if request.form.get('ship') == 'no' and prize.ship_to_winner != False:
+                prize.ship_to_winner = False
+                db.session.commit()
+                edited = True
+            elif request.form.get('ship') == 'yes' and prize.ship_to_winner != True:
+                prize.ship_to_winner = True
+                db.session.commit()
+                edited = True
+            if edited:
+                flash('Edited item!', 'is-success')
+            else:
+                flash('No changes.', 'is-info')
         return render_template('raffle/show_prize.html', prize=prize)
 
 
