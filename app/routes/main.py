@@ -12,5 +12,5 @@ def index():
         entries=Entry.query.filter(Entry.confirmed == True).count(),
         prizes=Prize.query.filter().count(),
         drawings=Drawing.query.filter().count(),
-        winners=DrawingPrize.query.filter().count()
+        winners=DrawingPrize.query.filter(DrawingPrize.winner != None).count()
     )

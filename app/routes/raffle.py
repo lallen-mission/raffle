@@ -106,7 +106,16 @@ def show_prize(id):
                 flash('Edited item!', 'is-success')
             else:
                 flash('No changes.', 'is-info')
-        return render_template('raffle/show_prize.html', prize=prize)
+        drawings = Drawing.query.join(
+            DrawingPrize
+        ).filter(
+            DrawingPrize.prize_id == id
+        )
+        return render_template(
+            'raffle/show_prize.html', 
+            prize=prize,
+            drawings=drawings
+        )
 
 
 @bp.route('/prize/delete/<id>')
@@ -153,9 +162,10 @@ def manage_drawings():
 
 
 @bp.route('/drawing/show/<id>', methods=['GET', 'POST'])
+@login_required
 def show_drawing(id):
     drawing = Drawing.query.filter(Drawing.id == id).first()
-    if not Drawing:
+    if not drawing:
         flash('No drawing there big dawg', 'is-warning')
         return redirect(url_for('raffle.manage_drawings'))
     else:
@@ -201,9 +211,19 @@ def show_drawing(id):
 @bp.route('/drawing/delete/<id>')
 @login_required
 def delete_drawing(id):
-    drawing = Drawing.query.filter(Drawing.id == id).first()
+    drawing = Drawing.query.get(id)
     if drawing:
         flash(f'You deleted drawing #{drawing.id} ({drawing.name})', 'is-success')
         db.session.delete(drawing)
         db.session.commit()
         return redirect(url_for('raffle.manage_drawings'))
+
+
+@bp.route('/drawing/start/<id>')
+@login_required
+def start_drawing(id):
+    drawing = Drawing.query.get(id)
+    if not drawing:
+        flash('no drawing there dawg', 'is-warning')
+        return redirect('/')
+    return 'ok'

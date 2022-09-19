@@ -36,7 +36,7 @@
 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-    <nav class="level">
+    <nav class="level notif">
         <div class="level-item has-text-centered">
             {% for category, message in messages %}
                 <article class="message {{ category }}">
@@ -49,3 +49,22 @@
     </nav>
 {% endif %}
 {% endwith %}
+
+<style>
+    .notif {
+        position: fixed;
+        margin: 0 auto;
+        width: 100%;
+        z-index: 1;
+        padding-top: 3.5em;
+    }
+</style>
+
+<script>
+    (document.querySelectorAll('.notif') || []).forEach(($notif) => {
+        setTimeout(function() {
+            console.log('deleting element ' + $notif);
+            $notif.remove();
+        }, 3000)
+    });
+</script>
