@@ -3,7 +3,12 @@
 {% block title %}Enter Raffle{% endblock %}
 
 {% block content %}
-    <div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h4 style="padding: 2em; margin: 0 auto; text-align: center;">The Raffle is currently only available for U.S. citizens.</h4>
+    <div id="qrCode" class="card hidden" style="max-width: 600px; margin: 0 auto;">
+        <div class="card-content">
+            <p>Please use your mobile device to navigate to the URL presented by the QR Code. The page in the presented URL will serve as your raffle ticket; please screenshot it and keep the tab available for reference.</p>
+        </div>
+        
         <div class="card-image">
             <figure class="image is-square">
                 <img src="data:image/png;base64,{{ qrcode }}" width=400 alt="Raffle entry {{ entry.uuid }}">
@@ -32,4 +37,30 @@
             <a href="" class="card-footer-item" style="color: red">Reject</a>
         </footer>
     </div>
+
+    <style>
+        .hidden {
+            display: none;
+        }
+        .hbspt-form {
+            width: 60%;
+            margin: 0 auto;
+            padding-top: 5em;
+        }
+        .submitted-message {
+            text-align: center;
+        }
+    </style>
+
+    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+    <script>
+        hbspt.forms.create({
+            region: "na1",
+            portalId: "2147348",
+            formId: "5a2d8707-e917-4290-9923-8c760fdc2b76",
+            onFormSubmitted: function($form) {
+                document.getElementById('qrCode').classList.remove('hidden');
+            }
+        });
+    </script>
 {% endblock %}
