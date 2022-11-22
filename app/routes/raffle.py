@@ -165,7 +165,10 @@ def manage_drawings():
 def show_drawing(id):
     drawing = Drawing.query.filter(Drawing.id == id).first()
     if not drawing:
-        flash('No drawing there big dawg', 'is-warning')
+        flash('No drawing there', 'is-warning')
+        return redirect(url_for('raffle.manage_drawings'))
+    elif drawing.has_concluded:
+        flash('That drawing has concluded and cannot be changed', 'is-warning')
         return redirect(url_for('raffle.manage_drawings'))
     else:
         edited = None
@@ -211,11 +214,18 @@ def show_drawing(id):
 @login_required
 def delete_drawing(id):
     drawing = Drawing.query.get(id)
-    if drawing:
-        flash(f'You deleted drawing #{drawing.id} ({drawing.name})', 'is-success')
-        db.session.delete(drawing)
-        db.session.commit()
+    if not drawing:
+        flash('That drawing does not exist', 'is-warning')
         return redirect(url_for('raffle.manage_drawings'))
+    
+    if drawing.has_concluded:
+        flash('That drawing has concluded, you cannot delete it', 'is-warning')
+        return redirect(url_for('raffle.manage_drawings'))
+    
+    db.session.delete(drawing)
+    db.session.commit()
+    flash(f'You deleted drawing #{drawing.id} ({drawing.name})', 'is-success')
+    return redirect(url_for('raffle.manage_drawings'))
 
 
 @bp.route('/drawing/start/<id>')
@@ -224,7 +234,11 @@ def start_drawing(id):
     drawing = Drawing.query.get(id)
     if not drawing:
         flash('There is no drawing there', 'is-warning')
-        return redirect('/')
+        return redirect(url_for('raffle.manage_drawings'))
+    
+    if drawing.has_concluded:
+        flash('That drawing has concluded, you cannot start it', 'is-warning')
+        return redirect(url_for('raffle.manage_drawings'))
     
     ongoing = Drawing.query.filter(Drawing.is_active == True).first()
     if ongoing:
@@ -238,7 +252,7 @@ def start_drawing(id):
 def now():
     drawing = Drawing.query.filter(Drawing.is_active == True).first()
     if not drawing:
-        flash(f'There is no active raffle right now. Check back later.')
+        flash(f'There is no active raffle right now. Check back later.', 'is-warning')
         return redirect(url_for('main.index'))
 
     prize = drawing.get_next_prize()
@@ -263,7 +277,7 @@ def now():
 def reselect():
     drawing = Drawing.query.filter(Drawing.is_active == True).first()
     if not drawing:
-        flash(f'There is no active raffle right now. Check back later.')
+        flash(f'There is no active raffle right now. Check back later.', 'is-warning')
         return redirect(url_for('main.index'))
     
     prize = drawing.get_next_prize()
@@ -281,7 +295,7 @@ def reselect():
 def confirm():
     drawing = Drawing.query.filter(Drawing.is_active == True).first()
     if not drawing:
-        flash(f'There is no active raffle right now. Check back later.')
+        flash(f'There is no active raffle right now. Check back later.', 'is-warning')
         return redirect(url_for('main.index'))
     
     prize = drawing.get_next_prize()

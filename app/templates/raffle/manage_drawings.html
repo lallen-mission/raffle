@@ -20,7 +20,13 @@
             {% endif %}
             <ul>
                 {% for drawing in drawings %}
-                    <li class="subtitle"><a href="{{ url_for('raffle.show_drawing', id=drawing.id) }}">#{{ drawing.id }} - {{ drawing.name }}</a></li>
+                    <li class="subtitle">
+                        {% if drawing.has_concluded %}
+                            <s>#{{ drawing.id }} - {{ drawing.name }}</s>
+                        {% else %}
+                            <a href="{{ url_for('raffle.show_drawing', id=drawing.id) }}">#{{ drawing.id }} - {{ drawing.name }}</a>
+                        {% endif %}
+                    </li>
                 {% endfor %}
             </ul>
         </p>

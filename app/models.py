@@ -93,6 +93,7 @@ class Drawing(db.Model):
     date_ended = db.Column(db.DateTime, nullable=True)
     create_date = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=False)
+    has_concluded = db.Column(db.Boolean, default=False)
 
     def get_next_prize(self):
         drawing_prizes = DrawingPrize.query.filter(
@@ -104,6 +105,7 @@ class Drawing(db.Model):
     def end(self):
         self.date_ended = datetime.utcnow()
         self.is_active = False
+        self.has_concluded = True
         db.session.commit()
     
     def start(self):
