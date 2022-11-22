@@ -3,7 +3,7 @@ from base64 import b64encode
 from secrets import choice
 
 from qrcode import make as qrcode_make
-from flask import Blueprint, render_template, url_for, redirect, request, flash
+from flask import Blueprint, render_template, url_for, redirect, request, flash, jsonify
 from flask_login import login_required
 
 from app.models import Entry, Prize, Drawing, DrawingPrize
@@ -257,6 +257,7 @@ def now():
 
     prize = drawing.get_next_prize()
     if not prize:
+        drawing.end()
         flash('There are no more prizes to be raffled')
         return redirect(url_for('main.index'))
 
@@ -307,3 +308,11 @@ def confirm():
     prize.confirmed_winner_id = prize.selected_entry_id
     db.session.commit()
     return redirect(url_for('raffle.now'))
+
+@bp.route('/raffle/check')
+def check():
+    drawing = Drawing.query.filter(Drawing.is_active == True).first()
+    if drawing:
+        return jsonify({'active': True})
+    else:
+        return jsonify({'active': False})

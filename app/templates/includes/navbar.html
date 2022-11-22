@@ -22,7 +22,7 @@
         <div class="navbar-end">
             <div class="navbar-item">
                 <div class="buttons">
-                    <a class="button is-warning" href="{{ url_for('raffle.now') }}"><i class="fa-solid fa-dice mr-2"></i> Raffling Now!</a>
+                    <a class="button is-warning hidden" id="raffleActive" href="{{ url_for('raffle.now') }}"><i class="fa-solid fa-dice mr-2"></i> Raffling Now!</a>
                     {% if current_user.is_authenticated %}
                         <a href="/logout" class="button"><img src="{{ current_user.profile_pic }}" alt="{{ current_user.email }} Google profile pic"> Log out ({{ current_user.name }})</a>
                     {% else %}
@@ -59,6 +59,9 @@
         z-index: 1;
         padding-top: 1em;
     }
+    .hidden {
+        display: none;
+    }
 </style>
 
 <script>
@@ -67,5 +70,20 @@
             console.log('deleting element ' + $notif);
             $notif.remove();
         }, 3000)
+    });
+
+    async function checkRaffle() {
+        await fetch(`/raffle/check`)
+            .then((resp) => resp.json())
+            .then(function(data) {
+                if (data['active']) {
+                    document.getElementById('raffleActive').classList.remove('hidden')
+                }
+            });
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        checkRaffle();
+        setInterval(checkRaffle, 5000);
     });
 </script>
