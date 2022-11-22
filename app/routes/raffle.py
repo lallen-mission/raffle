@@ -282,7 +282,8 @@ def reselect():
     
     prize = drawing.get_next_prize()
     if not prize:
-        return 'no more prizes'
+        flash(f'There is no active raffle right now. Check back later.', 'is-warning')
+        return redirect(url_for('main.index'))
     
     potentials = Entry.query.filter(Entry.has_won == False).all()
     selected = choice(potentials)
@@ -300,7 +301,8 @@ def confirm():
     
     prize = drawing.get_next_prize()
     if not prize:
-        return 'no more prizes'
+        flash(f'There is no active raffle right now. Check back later.', 'is-warning')
+        return redirect(url_for('main.index'))
     
     prize.confirmed_winner_id = prize.selected_entry_id
     db.session.commit()
