@@ -58,6 +58,7 @@ class Entry(db.Model):
     create_date = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.ForeignKey('users.id'))
     confirmed = db.Column(db.Boolean, default=False)
+    has_won = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return str(self.uuid)
@@ -91,6 +92,24 @@ class Drawing(db.Model):
     date_started = db.Column(db.DateTime, nullable=True)
     date_ended = db.Column(db.DateTime, nullable=True)
     create_date = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=False)
+
+    def get_next_prize(self):
+        drawing_prizes = DrawingPrize.query.filter(
+            DrawingPrize.drawing_id == self.id,
+            DrawingPrize.confirmed_winner == None
+        ).order_by(DrawingPrize.create_date.asc())
+        return drawing_prizes.first()
+    
+    def end(self):
+        self.date_ended = datetime.utcnow()
+        self.is_active = False
+        db.session.commit()
+    
+    def start(self):
+        self.date_started = datetime.utcnow()
+        self.is_active = True
+        db.session.commit()
 
     def __repr__(self):
         return str(self.name)
@@ -107,7 +126,10 @@ class DrawingPrize(db.Model):
     prize = db.relationship('Prize')
     drawing_id = db.Column(db.ForeignKey('drawings.id', ondelete='CASCADE'))
     drawing = db.relationship('Drawing')
-    winner = db.Column(db.ForeignKey('entries.id'))
+    confirmed_winner_id = db.Column(db.ForeignKey('entries.id'))
+    confirmed_winner = db.relationship('Entry', foreign_keys=[confirmed_winner_id])
+    selected_entry_id = db.Column(db.ForeignKey('entries.id'))
+    selected_entry = db.relationship('Entry', foreign_keys=[selected_entry_id])
     create_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):

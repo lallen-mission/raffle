@@ -1,5 +1,6 @@
 from io import BytesIO
 from base64 import b64encode
+from secrets import choice
 
 from qrcode import make as qrcode_make
 from flask import Blueprint, render_template, url_for, redirect, request, flash
@@ -152,12 +153,10 @@ def manage_drawings():
         except Exception as e:
             print(e)
             flash('Something went wrong. Try again.', 'is-danger')
-    drawings = Drawing.query.all()
-    prizes = Prize.query.all()
+    drawings = Drawing.query.filter().order_by(Drawing.create_date.asc())
     return render_template(
         'raffle/manage_drawings.html',
-        drawings=drawings,
-        prizes=prizes
+        drawings=drawings
     )
 
 
@@ -224,6 +223,71 @@ def delete_drawing(id):
 def start_drawing(id):
     drawing = Drawing.query.get(id)
     if not drawing:
-        flash('no drawing there dawg', 'is-warning')
+        flash('There is no drawing there', 'is-warning')
         return redirect('/')
-    return 'ok'
+    
+    ongoing = Drawing.query.filter(Drawing.is_active == True).first()
+    if ongoing:
+        flash(f'There is already an active raffle (#{ongoing.id})')
+        return redirect(url_for('raffle.now'))
+
+    drawing.start()
+    return redirect(url_for('raffle.now'))
+
+@bp.route('/raffle')
+def now():
+    drawing = Drawing.query.filter(Drawing.is_active == True).first()
+    if not drawing:
+        flash(f'There is no active raffle right now. Check back later.')
+        return redirect(url_for('main.index'))
+
+    prize = drawing.get_next_prize()
+    if not prize:
+        flash('There are no more prizes to be raffled')
+        return redirect(url_for('main.index'))
+
+    if prize.selected_entry == None:
+        potentials = Entry.query.filter(Entry.has_won == False).all()
+        selected = choice(potentials)
+        prize.selected_entry_id = selected.id
+        db.session.commit()
+    
+    return render_template(
+        'raffle/raffling.html',
+        drawing=drawing,
+        prize=prize
+    )
+
+@bp.route('/raffle/reselect')
+@login_required
+def reselect():
+    drawing = Drawing.query.filter(Drawing.is_active == True).first()
+    if not drawing:
+        flash(f'There is no active raffle right now. Check back later.')
+        return redirect(url_for('main.index'))
+    
+    prize = drawing.get_next_prize()
+    if not prize:
+        return 'no more prizes'
+    
+    potentials = Entry.query.filter(Entry.has_won == False).all()
+    selected = choice(potentials)
+    prize.selected_entry_id = selected.id
+    db.session.commit()
+    return redirect(url_for('raffle.now'))
+
+@bp.route('/raffle/confirm')
+@login_required
+def confirm():
+    drawing = Drawing.query.filter(Drawing.is_active == True).first()
+    if not drawing:
+        flash(f'There is no active raffle right now. Check back later.')
+        return redirect(url_for('main.index'))
+    
+    prize = drawing.get_next_prize()
+    if not prize:
+        return 'no more prizes'
+    
+    prize.confirmed_winner_id = prize.selected_entry_id
+    db.session.commit()
+    return redirect(url_for('raffle.now'))
