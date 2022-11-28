@@ -18,7 +18,7 @@ then
   pgrep -F $BASE/gunicorn.pid
   if [[ $? != 0 ]]; then
     gunicorn \
-      --bind 127.0.0.1:4000 "raffler.app:app" \
+      --bind 127.0.0.1:4000 "app.app:app" \
       --daemon \
       --log-file $BASE/gunicorn.log \
       --pid $BASE/gunicorn.pid \
